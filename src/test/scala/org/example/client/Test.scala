@@ -4,6 +4,6 @@ import org.scalatest.funsuite.AnyFunSuite
 
 class Test extends AnyFunSuite {
   test("test") {
-    println(Client.service.getInventory())
+    println(Client.getClient.getInventory())
   }
 }

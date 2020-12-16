@@ -11,6 +11,7 @@ import scala.reflect.macros.whitebox
 object ClientImplementation extends StaticAnnotation {
 
   def impl(c: whitebox.Context)(annottees: c.Expr[Any]*): c.Expr[Any] = {
+    println("Annottees: " + annottees)
     import c.universe._
     val traitDef: ClassDef = extractTraitDef(c)(annottees)
     val pathString: String = extractPath(c)(c.prefix.tree.children)
@@ -20,17 +21,17 @@ object ClientImplementation extends StaticAnnotation {
     val methodsImpl: List[DefDef] = extractDefs(c)(traitDef).map(mapDef(c)(_))
     val emptyBlock: Block = q"new $serviceName {}".asInstanceOf[Block]
     val fullBlock: Block = fillBlock(c)(emptyBlock, methodsImpl)
-    val defApply: DefDef = q"def apply(): $serviceName = $fullBlock".asInstanceOf[DefDef]
+    val implVal: ValDef = q"implicit val impl: $serviceName = $fullBlock".asInstanceOf[ValDef]
     val emptyModule: ModuleDef = q"object ${serviceName.toTermName} {}".asInstanceOf[ModuleDef]
-    val fullModule: ModuleDef = fillModule(c)(emptyModule, defApply)
-    val resultBlock: Block = Block(List(traitDef, annottees.tail.head.tree), Literal(Constant()))
-    println(resultBlock)
+    val fullModule: ModuleDef = fillModule(c)(emptyModule, implVal)
+    val resultBlock: Block = Block(List(traitDef, fullModule), Literal(Constant()))
+    println("resultBlock: " + resultBlock)
     c.Expr[Any](resultBlock)
   }
 
-  def fillModule(c: whitebox.Context)(oldModuleDef: c.universe.ModuleDef, defApply: c.universe.DefDef): c.universe.ModuleDef = {
+  def fillModule(c: whitebox.Context)(oldModuleDef: c.universe.ModuleDef, valDef: c.universe.ValDef): c.universe.ModuleDef = {
     val oldTemplate: c.universe.Template = oldModuleDef.children.head.asInstanceOf[c.universe.Template]
-    val newTemplate: c.universe.Template = c.universe.Template(oldTemplate.parents, oldTemplate.self, List(oldTemplate.body.head, defApply))
+    val newTemplate: c.universe.Template = c.universe.Template(oldTemplate.parents, oldTemplate.self, List(oldTemplate.body.head, valDef))
     c.universe.ModuleDef(oldModuleDef.mods, oldModuleDef.name, newTemplate)
   }
 
@@ -48,10 +49,7 @@ object ClientImplementation extends StaticAnnotation {
   }
 
   def mapDef(c: whitebox.Context)(defDef: c.universe.DefDef): c.universe.DefDef =
-    c.universe.DefDef(c.universe.Modifiers(addFlags(c)(defDef.mods.flags, c.universe.Flag.OVERRIDE)), defDef.name, defDef.tparams, defDef.vparamss, defDef.tpt, throwNotImplemented(c))
-
-  //    c.universe.DefDef(defDef.mods, defDef.name, defDef.tparams, defDef.vparamss, defDef.tpt, throwNotImplemented(c))
-
+    c.universe.DefDef(c.universe.Modifiers(c.universe.Flag.OVERRIDE), defDef.name, defDef.tparams, defDef.vparamss, defDef.tpt, throwNotImplemented(c))
 
   def addFlags(c: whitebox.Context)(flagSets: c.universe.FlagSet*): c.universe.FlagSet = {
     import c.universe._

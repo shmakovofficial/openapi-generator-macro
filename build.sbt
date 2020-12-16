@@ -21,17 +21,5 @@ libraryDependencies += "org.endpoints4s" %% "sttp-client" % "2.0.0"
 // https://mvnrepository.com/artifact/org.scalatest/scalatest
 libraryDependencies += "org.scalatest" %% "scalatest" % "3.2.3" % Test
 
-// https://mvnrepository.com/artifact/com.softwaremill.macwire/macros
-libraryDependencies += "com.softwaremill.macwire" %% "macros" % "2.3.7" % Test
-
-// https://mvnrepository.com/artifact/com.softwaremill.macwire/macrosakka
-libraryDependencies += "com.softwaremill.macwire" %% "macrosakka" % "2.3.7" % Test
-
-// https://mvnrepository.com/artifact/com.softwaremill.macwire/util
-libraryDependencies += "com.softwaremill.macwire" %% "util" % "2.3.7" % Test
-
-// https://mvnrepository.com/artifact/com.softwaremill.macwire/proxy
-libraryDependencies += "com.softwaremill.macwire" %% "proxy" % "2.3.7" % Test
-
 // https://mvnrepository.com/artifact/com.softwaremill.sttp.client/core
 libraryDependencies += "com.softwaremill.sttp.client" %% "core" % "2.2.9" % Test
