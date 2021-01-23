@@ -4,5 +4,5 @@ import scala.annotation.{StaticAnnotation, compileTimeOnly}
 
 @compileTimeOnly("enable macro paradise to expand macro annotations")
 class SttpImplementation(path: String) extends StaticAnnotation {
-  def macroTransform(annottees: Any*): Any = macro ClientImplementation.impl
+  def macroTransform(annottees: Any*): Any = macro SttpClientImplementation.impl
 }
